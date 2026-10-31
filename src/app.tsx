@@ -13,11 +13,21 @@ export function createApp(config: RigConfig = loadConfig()) {
   app.get('/health', (c) => c.json({ ok: true, lane: lane().id }));
 
   app.get('/', (c) =>
-    c.html(
-      <Layout title="status" lane={lane()}>
-        <StatusBoard status={readStatus(config)} />
-      </Layout>,
-    ),
+    {
+      const status = readStatus(config);
+      const nights = status.nights.map((night) => {
+        const digest = readNight(config.runsDir, night);
+        const counts = { ok: 0, retry: 0, fail: 0 };
+        for (const row of digest?.rows ?? []) counts[row.lastStatus] += 1;
+        return { night, ...counts };
+      });
+
+      return c.html(
+        <Layout title="status" lane={lane()}>
+          <StatusBoard status={status} nights={nights} />
+        </Layout>,
+      );
+    },
   );
 
   app.get('/api/digest/:night', (c) => {
