@@ -1,9 +1,8 @@
 ---
 plan: morning-digest
-status: done
+status: ready
 owner: rook
 opened: 2026-10-29
-closed: 2026-10-31
 ---
 
 # Morning digest
@@ -73,20 +72,9 @@ Done when: the preview link is sent to the reviewer.
 
 ## 4. Clean up
 
-The preview carries this lane's marker on a public link (ADR 0003). Take the marker off: save the
-page again with `LANE_MARKER` unset (the banner reads "no marker set") and upload it over the same
-link. Move this plan to `docs/plans/done/` with its issue list.
+The preview carries this lane's marker on a public link (ADR 0003). Keep the marker until the
+reviewer has looked. Then take the marker off: save the page again with `LANE_MARKER` unset (the
+banner reads "no marker set") and upload it over the same link. Move this plan to
+`docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
-
-## Issues
-
-| # | Issue | Blocked by |
-|---|-------|-----------|
-| 1 | [Run log reader](https://github.com/mjaniczko/rig-morning-digest/issues/1) | — |
-| 2 | [Digest page](https://github.com/mjaniczko/rig-morning-digest/issues/2) | #1 |
-| 3 | [Digest JSON](https://github.com/mjaniczko/rig-morning-digest/issues/3) | #1 |
-| 4 | [Board links and counts](https://github.com/mjaniczko/rig-morning-digest/issues/4) | #1 |
-| 5 | [Route tests](https://github.com/mjaniczko/rig-morning-digest/issues/5) | #1 |
-| 6 | [Public review preview](https://github.com/mjaniczko/rig-morning-digest/issues/6) | #1–#5 |
-| 7 | [Remove marker and finish plan](https://github.com/mjaniczko/rig-morning-digest/issues/7) | #6 |
