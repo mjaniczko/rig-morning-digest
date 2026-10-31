@@ -1,0 +1,59 @@
+name: Publish digest preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      lane_marker:
+        description: Lane marker for the public preview; leave empty to publish without it
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.9
+      - run: pnpm install --no-frozen-lockfile
+      - name: Render the digest to one HTML file
+        env:
+          LANE_MARKER: ${{ inputs.lane_marker }}
+        run: |
+          set -euo pipefail
+          cp .env.example .env
+          pnpm exec tsx --env-file-if-exists=.env src/server.ts > /tmp/rig.log 2>&1 < /dev/null &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8787/health >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          mkdir -p public
+          curl --fail --show-error --silent http://127.0.0.1:8787/digest/2026-10-28 --output public/index.html
+          test -s public/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
